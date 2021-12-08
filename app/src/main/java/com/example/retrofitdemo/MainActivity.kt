@@ -28,31 +28,11 @@ class MainActivity : AppCompatActivity() {
 
         val apiInterface = APIClient().getClient()?.create(APIInterface::class.java)
 
-        // here we use the enqueue callback to make sure that we get the data before we update the Recycler View
-        // enqueue gives us async functionality like coroutines, later we will replace this with coroutines
-        apiInterface?.getPrices()?.enqueue(object: Callback<Prices>{
-            override fun onResponse(call: Call<Prices>, response: Response<Prices>) {
-                try{
-                    // once we get our data, we can update the prices Array List and use it to update the Recycler View
-                    prices.add(response.body()!!.eur!!.usd!!)
-                    prices.add(response.body()!!.eur!!.aud!!)
-                    rvAdapter.notifyDataSetChanged()
-                }catch(e: Exception){
-                    Log.d("MAIN", "ISSUE: $e")
-                }
-            }
-
-            override fun onFailure(call: Call<Prices>, t: Throwable) {
-                Log.d("MAIN", "Unable to get data")
-            }
-
-        })
-
-        // here we use our JSON to Kotlin classes
         apiInterface?.getAll()?.enqueue(object: Callback<PriceData>{
             override fun onResponse(call: Call<PriceData>, response: Response<PriceData>) {
-                prices.add(response.body()!!.eur.usd.toString())
-                prices.add(response.body()!!.eur.aud.toString())
+                prices.add("AUD: ${response.body()!!.eur.aud}")
+                prices.add("JPY: ${response.body()!!.eur.jpy}")
+                prices.add("USD: ${response.body()!!.eur.usd}")
                 rvAdapter.notifyDataSetChanged()
             }
 
